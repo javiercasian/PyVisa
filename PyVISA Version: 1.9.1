@@ -5,15 +5,8 @@ Problems with pyVISA
 Hi
 This is my first time using this webpage so, I apologize is I do something wrong. 
 
-So, I'm trying to use PyVISA Version: 1.9.1.  
+So, I'm trying to use PyVISA Version: 1.9.1.  (Please see below my system details) 
 
-PC Infor Below: 
-
-
-Microsoft Windows [Version 6.1.7601]
-Copyright (c) 2009 Microsoft Corporation.  All rights reserved.
-
-C:\Users\fcasian.AM>python -m visa info
 Machine Details:
    Platform ID:    Windows-7-6.1.7601-SP1
    Processor:      Intel64 Family 6 Model 70 Stepping 1, GenuineIntel
@@ -61,3 +54,68 @@ Backends:
          Please install PyUSB to use this resource type.
          No module named 'usb'
 
+My code, some of the times work some others does not, please see below my code: 
+
+import visa
+try:
+    rm = visa.ResourceManager()
+    logging.info("Opening System resources...\n")
+    rm.list_resources()
+    logging.info(rm.list_resources())
+    logging.info(rm)
+
+    DA34970A = rm.open_resource('GPIB2::10::INSTR')
+    DA34970A.timeout =  5000
+    SG8648C = rm.open_resource('GPIB0::12::INSTR')
+    SG8648C.timeout =  5000
+    RF53210A = rm.open_resource('GPIB1::11::INSTR')
+    RF53210A.timeout =  5000
+    
+    logging.info("initializing the instruments... \n")
+    SG8648C.write("*rst; status:preset; *cls")
+    time.sleep(.25)
+    RF53210A.write("*rst; status:preset; *cls")
+    time.sleep(.25)
+    DA34970A.write("*rst; status:preset; *cls")
+    time.sleep(25)
+    
+except:
+    pass
+    logging.info ("Instrumments are not Responding")
+    logging.shutdown()
+    quit()
+
+logging.info("Requesting Instruments ID \n")
+
+logging.info(SG8648C.query("*IDN?"))
+time.sleep(5)
+logging.info(RF53210A.query("*IDN?"))
+time.sleep(5)
+logging.info(DA34970A.query("*IDN?"))
+time.sleep(5)
+
+
+#########
+
+However, some times I get error below:
+
+Traceback (most recent call last):
+  File "C:\Python34\Lib\site-packages\pythonwin\pywin\framework\scriptutils.py", line 323, in RunScript
+    debugger.run(codeObject, __main__.__dict__, start_stepping=0)
+  File "C:\Python34\Lib\site-packages\pythonwin\pywin\debugger\__init__.py", line 60, in run
+    _GetCurrentDebugger().run(cmd, globals,locals, start_stepping)
+  File "C:\Python34\Lib\site-packages\pythonwin\pywin\debugger\debugger.py", line 654, in run
+    exec(cmd, globals, locals)
+  File "\\Mac\Home\Documents\Python Scripts\Python Win Scripts\Fiji Flatness-Band\Fiji1.011.py", line 27, in <module>
+    print("!=================================================================")
+  File "C:\Python34\lib\site-packages\pyvisa\resources\messagebased.py", line 569, in query
+    return self.read()
+  File "C:\Python34\lib\site-packages\pyvisa\resources\messagebased.py", line 413, in read
+    message = self._read_raw().decode(enco)
+  File "C:\Python34\lib\site-packages\pyvisa\resources\messagebased.py", line 386, in _read_raw
+    chunk, status = self.visalib.read(self.session, size)
+  File "C:\Python34\lib\site-packages\pyvisa\ctwrapper\functions.py", line 1584, in read
+    ret = library.viRead(session, buffer, count, byref(return_count))
+  File "C:\Python34\lib\site-packages\pyvisa\ctwrapper\highlevel.py", line 188, in _return_handler
+    raise errors.VisaIOError(ret_value)
+pyvisa.errors.VisaIOError: VI_ERROR_SYSTEM_ERROR (-1073807360): Unknown system error (miscellaneous error).
