@@ -1,2 +1,0 @@
-# PyVisa
-Problems with pyVISA 
